@@ -1,0 +1,14 @@
+__pycache__/
+/save
+test.py
+selector.json
+urls.txt
+**/*.{jpg,png}
+
+/src/rules/*
+/src/rules/.**
+
+!/src/rules/basic_rule.py
+!/src/rules/id_required_rule.py
+!/src/rules/cloudflare_rule.py
+!/src/rules/rule.py
