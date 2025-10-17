@@ -43,7 +43,7 @@ sequential-image-downloader
 * メソッドをオーバーライドして追加の個別処理
 
 ### 実装方法
-basic_rule.pyの`BasicRule`クラスまたは、id_required_rule.pyの`IdRequiredRule`クラスを継承したルールを作成する (基本的に`BasicRule`を使用。`IdRequiredRule`については後述)
+`basic_rule.py`の`BasicRule`クラスまたは、id_required_rule.pyの`IdRequiredRule`クラスを継承したルールを作成する (基本的に`BasicRule`を使用。`IdRequiredRule`については後述)
 
 クラスの命名ルールは、`"{ウェブサイトのドメイン名}+Rule"`とキャメルケースで記載する
 
@@ -79,7 +79,7 @@ class ExampleComRule(BasicRule):
 cssセレクタはダウンロードしたい画像のうちの一番先頭の画像から取る。
 
 #### ルールの追加
-次に、実装したルールクラスをrules.pyの`RULES`リストに追加する
+次に、実装したルールクラスを`rules.py`の`RULES`リストに追加する。
 
 ```python
 from rules.example_com_rule import ExampleComRule
@@ -89,6 +89,10 @@ RULES: list[Rule] = [
   ExampleComRule(),
   # 下にどんどん追加していく
 ]
+```
+最初は`rules.py`を作成する必要がある。
+```bash
+$ touch src/rule/rules.py
 ```
 
 ## 1. URLをファイルに入力
@@ -102,23 +106,25 @@ example2.com/post/0001
 ```
 
 ## 2.実行
-main.pyを実行する
+`main.py`を実行する
 ```
 $ python main.py
 ```
 実行すると、saveフォルダに画像がダウンロードされている
 
-また、ダウンロード完了したurlは、urls.txtから自動的に削除される
+また、ダウンロード完了したurlは、`urlx.txt`から自動的に削除される
 
-ダウンロード中にエラーが発生したurlは、urlx.txtに残る
+ダウンロード中にエラーが発生したurlは、`urls.txt`に残る
+
+ダウンロード中に`urls.txt`を編集する操作は行わない方がよい。
 
 ## `IdRequiredRule`について
-たまに以下のような、URL末尾の数字とCSSセレクタのクラス名が対応しているウェブサイトがある
+たまに以下のような、URL末尾の数字とCSSセレクタのクラス名が対応しているウェブサイトがある。
 ```
 URL :https://example2.com/post/114514
 CSSセレクタ :#post-114514 > ul > li:nth-child(1) > img
 ```
 
-この場合、URLによってCSSセレクタが毎回変わってしまうため、`IdRequiredRule`クラスでは`BasicRule`にURLからCSSセレクタを生成するコードを追加している
+この場合、URLによってCSSセレクタが毎回変わってしまうため、`IdRequiredRule`クラスでは`BasicRule`にURLからCSSセレクタを生成するコードを追加している。
 
-以上から、このようなページの構造をしているウェブサイトのルールを作成する場合は、`IdRequiredRule`クラスを継承する必要がある
+以上から、このようなページの構造をしているウェブサイトのルールを作成する場合は、`IdRequiredRule`クラスを継承する必要がある。
