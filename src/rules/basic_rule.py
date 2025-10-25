@@ -15,10 +15,11 @@ class BasicRule(Rule):
     _step                  : int       -> nth-childの増え方
     _try_again_limit       : int       -> imgタグが見つからなかった時何回やり直すか
     """
-    def __init__(self, domain:str, selectors:list[str], start_nth_child_index:int, step:int=1, try_again_limit:int=2):
+    def __init__(self, domain:str, selectors:list[str], start_nth_child_index:int, title_selector:str="", step:int=1, try_again_limit:int=2):
         self._domain = domain
         self._selectors = selectors
         self._start_nth_child_index = start_nth_child_index
+        self._title_selector = title_selector
         self._step = step
         self._try_again_limit = try_again_limit
     
@@ -34,11 +35,8 @@ class BasicRule(Rule):
         return self._start_nth_child_index
         
     # uri先のサイトの縦に並べられた画像のurlをリストとして取得
-    def collect_image_urls(self, uri: Uri) -> list[str]:
+    def collect_image_urls(self, uri, body) -> list[str]:
         image_urls: list[str] = []
-        
-        html = self.getHtml(uri)
-        body = self.parseHtml(html)
         
         i = 0
         selector_number = 0
@@ -71,13 +69,21 @@ class BasicRule(Rule):
         
         return image_urls
     
+    def get_title(self, body) -> str | None:
+        if self._title_selector == "":
+            return None
+        title = body.select(self._title_selector)
+        if title == []:
+            return None
+        return title[0].get_text(strip=True)
+    
     def request(self, url:str):
         headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"}
         res = requests.get(url, headers=headers)
         return res
     
     # uri先のhtmlを取得
-    def getHtml(self, uri:Uri) -> str:
+    def get_html(self, uri:Uri) -> str:
         res = self.request(uri.url)
         if res.status_code != 200 and res.status_code != 201:
             raise Exception(f"Cannot connect -> status code:{res.status_code}")
@@ -85,7 +91,7 @@ class BasicRule(Rule):
         return html
     
     # htmlをbeautifulsoupでパース
-    def parseHtml(self, html:str):
+    def parse_html(self, html:str):
         body = BeautifulSoup(html, "html.parser")
         return body
         

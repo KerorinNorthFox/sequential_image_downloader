@@ -24,9 +24,12 @@ class ImageDownloader(object):
         rule = self._get_selector_rule(uri.domain)
         if rule is None:
             raise Exception("Rule does not exist.")
-        image_urls: list[str] = rule.collect_image_urls(uri)
+        html = rule.get_html(uri)
+        body = rule.parse_html(html)
+        image_urls: list[str] = rule.collect_image_urls(uri, body)
+        title: str|None = rule.get_title(body)
         
-        complete_save_dir = self._combine_save_dir(save_dir, uri)
+        complete_save_dir = self._combine_save_dir(save_dir, uri, title)
         
         for i, image_url in enumerate(image_urls):
             save_path = os.path.join(complete_save_dir, f"{i+1}.jpg")
@@ -57,7 +60,7 @@ class ImageDownloader(object):
             if domain == rule():
                 return rule
     
-    def _combine_save_dir(self, save_path, uri) -> str:
+    def _combine_save_dir(self, save_path:str, uri:Uri, title:str|None) -> str:
         dirs = ""
         if uri.directories != []: # urlの間のディレクトリをパスにする
             for directory in uri.directories:
@@ -69,6 +72,10 @@ class ImageDownloader(object):
         for dir_ban_word in dir_ban_words:
             dirs = dirs.replace(dir_ban_word, "")
             
+        if title is not None:
+            print(title)
+            print(type(title))
+            dirs = os.path.join(dirs, title)
         save_dir_path = os.path.join(save_path, dirs)
         save_dir_path = self._unquote_save_dir(save_dir_path)
             
