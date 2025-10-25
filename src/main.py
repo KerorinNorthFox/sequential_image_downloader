@@ -13,7 +13,8 @@ def main(save_dir:str, urls_path:str):
         try:
             p.download(Uri(url), save_dir)
             urls_w.pop(error_url_index)
-        except:
+        except Exception as e:
+            print(e)
             error_url_index += 1
             
     with open(urls_path, mode="w", encoding="utf-8") as f:
