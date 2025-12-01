@@ -79,7 +79,7 @@ class ImageDownloader(object):
         else:
             dirs = f"{dirs}/{uri.file}"
             
-        dir_ban_words = ["?", "？", ":"]
+        dir_ban_words = ["?", ":", "<", ">", "|"]
         for dir_ban_word in dir_ban_words:
             dirs = dirs.replace(dir_ban_word, "")
             
