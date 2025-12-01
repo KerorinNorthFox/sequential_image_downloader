@@ -110,9 +110,14 @@ class BasicRule(Rule):
         return [selector.replace("xxxx", str(i+self.start_nth_child_index)) for selector in self.selectors]
     
     def get_image_src(self, img):
+        key = None
         for attr in img[0].__dict__["attrs"]:
             if "src" in attr:
                 key = attr
+        if key is None:
+            for attr in img[0].__dict__["attrs"]:
+                if "href" in attr:
+                    key = attr
         src = img[0][key]
         src = src.split(" ")[0]
         return src
