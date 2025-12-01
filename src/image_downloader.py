@@ -41,6 +41,7 @@ class ImageDownloader(object):
                 continue
             
             with open(save_path, mode="wb") as f:
+                image_url = self._supplement_protocol_domain(image_url, uri.protocol, uri.domain)
                 img_res = rule.request(image_url)
                 f.write(img_res.content)
                 logger.info(f"{image_url} Download completed.")
@@ -98,3 +99,13 @@ class ImageDownloader(object):
     def _unquote_save_dir(self, save_dir_path):
         dir_path = urllib.parse.unquote(save_dir_path)
         return dir_path
+    
+    def _supplement_protocol_domain(self, uri_base, protocol, domain):
+        uri = uri_base
+        if not domain in uri:
+            uri = urllib.parse.urljoin(domain, uri_base)
+            
+        if not protocol in uri:
+            uri = urllib.parse.urljoin(protocol, uri_base)
+        
+        return uri
