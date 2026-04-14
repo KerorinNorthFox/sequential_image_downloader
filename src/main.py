@@ -2,7 +2,7 @@ from image_downloader import ImageDownloader, load_urls
 from uri import Uri
 import os
 
-def main(save_dir:str, urls_path:str):
+def main(save_dir:str, urls_path:str, post_path:str):
     p = ImageDownloader()
 
     urls_r = load_urls(urls_path)
@@ -11,7 +11,9 @@ def main(save_dir:str, urls_path:str):
     error_url_index = 0
     for url in urls_r:
         try:
-            p.download(Uri(url), save_dir)
+            post_texts = p.download(Uri(url), save_dir)
+            with open(post_path, mode="a", encoding="utf-8") as f:
+                f.writelines(post_texts)
             urls_w.pop(error_url_index)
         except Exception as e:
             print(e)
@@ -24,5 +26,6 @@ if __name__ == '__main__':
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     save_dir = os.path.join(parent_dir, "save")
     urls_path = os.path.join(parent_dir, "urls.txt")
+    post_path = os.path.join(parent_dir, "posts.txt")
     
-    main(save_dir, urls_path)
+    main(save_dir, urls_path, post_path)

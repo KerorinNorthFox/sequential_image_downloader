@@ -45,6 +45,8 @@ class ImageDownloader(object):
                 img_res = rule.request(image_url)
                 f.write(img_res.content)
                 logger.info(f"{image_url} Download completed.")
+
+        return self._generate_post_text(title, author, "", uri.url)
     
     """
     uriをチェックする
@@ -109,3 +111,7 @@ class ImageDownloader(object):
             uri = urllib.parse.urljoin(protocol, uri_base)
         
         return uri
+
+    def _generate_post_text(self, title:str, author:str, circle_name:str, url:str) -> list[str]:
+        return [f"{title}", f"{author}", f"{circle_name}", f"{url}", ""]
+
