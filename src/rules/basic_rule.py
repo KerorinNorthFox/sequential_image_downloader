@@ -15,12 +15,13 @@ class BasicRule(Rule):
     _step                  : int       -> nth-childの増え方
     _try_again_limit       : int       -> imgタグが見つからなかった時何回やり直すか
     """
-    def __init__(self, domain:str, selectors:list[str], start_nth_child_index:int, title_selector:str="", author_selector:str="", step:int=1, try_again_limit:int=2):
+    def __init__(self, domain:str, selectors:list[str], start_nth_child_index:int, title_selector:str="", author_selector:str="", circle_name_selector:str="", step:int=1, try_again_limit:int=2):
         self._domain = domain
         self._selectors = selectors
         self._start_nth_child_index = start_nth_child_index
         self._title_selector = title_selector
         self._author_selector = author_selector
+        self._circle_name_selector = circle_name_selector
         self._step = step
         self._try_again_limit = try_again_limit
     
@@ -87,6 +88,16 @@ class BasicRule(Rule):
         if author == []:
             return None
         return author[0].get_text(strip=True)
+
+    def get_circle_name(self, body) -> str | None: 
+        if self._circle_name_selector == "":
+            return None
+        circle_name = body.select(self._circle_name_selector)
+        print(circle_name)
+        print(type(circle_name))
+        if circle_name == []:
+            return None
+        return circle_name[0].get_text(strip=True)
     
     def request(self, url:str):
         headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"}

@@ -29,8 +29,10 @@ class ImageDownloader(object):
         image_urls: list[str] = rule.collect_image_urls(uri, body)
         title: str|None = rule.get_title(body)
         author: str|None = rule.get_author(body)
+        circle_name: str|None = rule.get_circle_name(body)
         print(title)
         print(author)
+        print(circle_name)
         
         complete_save_dir = self._combine_save_dir(save_dir, uri, title, author)
         
@@ -46,7 +48,7 @@ class ImageDownloader(object):
                 f.write(img_res.content)
                 logger.info(f"{image_url} Download completed.")
 
-        return self._generate_post_text(title, author, "", uri.url)
+        return self._generate_post_text(title, author, circle_name, uri.url)
     
     """
     uriをチェックする
