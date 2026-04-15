@@ -49,20 +49,20 @@ class BasicRule(Rule):
             
             if img == []:
                 if try_again_limit > 0:
-                    logger.warn(f"img is not exist. Try again same selector. (try count :{try_again_limit})")
+                    logger.warn(f"img does not exist. Try again same selector. (try count :{try_again_limit})")
                     try_again_limit -= 1
                     i += 1
                     continue
                 if selector_number+1 >= len(selectors):
-                    logger.error("img is not exist.")
+                    logger.error("img does not exist. Limit reached.")
                     break
-                logger.warn("img is not exist. Try another selector.")
+                logger.warn("img does not exist. Try another selector.")
                 selector_number += 1
                 continue
             
             src = self.get_image_src(img)
             if src == "" or src is None:
-                logger.error("src is not exist.")
+                logger.error("src is not exist. Skip it.")
                 continue
             logger.info(f"src :{src}")
             image_urls.append(src)

@@ -13,12 +13,12 @@ def load_urls(url_txt_path:str) -> list[str]:
 
 class ImageDownloader(object):
     def download(self, uri:Uri, save_dir:str):
+        print("\n================================")
         logger.info(f"The Url :{uri()}")
         
         if self._check_uri(uri):
             raise Exception("The uri is wrong.")
         
-        print("\n================================")
         logger.info(f"\nurl_structure:{uri.url_structure}\nprotocol     :{uri.protocol}\ndomain       :{uri.domain}\ndirectories  :{uri.directories}\nfile         :{uri.file}\n")
         
         rule = self._get_selector_rule(uri.domain)
@@ -30,16 +30,18 @@ class ImageDownloader(object):
         title: str|None = rule.get_title(body)
         author: str|None = rule.get_author(body)
         circle_name: str|None = rule.get_circle_name(body)
-        print(title)
-        print(author)
-        print(circle_name)
+        
+        post_descs = self._compile_post_description(title, author, circle_name, uri.url)
+        for desc in post_descs:
+            print(desc)
         
         complete_save_dir = self._combine_save_dir(save_dir, uri, title, author)
         
         for i, image_url in enumerate(image_urls):
-            save_path = os.path.join(complete_save_dir, self._replace_ban_words(f"{title}_{i+1}.jpg"))
+            file_name = self._replace_ban_words(f"{title}_{i+1}.jpg")
+            save_path = os.path.join(complete_save_dir, file_name)
             if os.path.exists(save_path):
-                logger.warn(f"The file is already exists. Skip it.")
+                logger.warn(f"The file '{file_name}' is already exists. Skip it.")
                 continue
             
             with open(save_path, mode="wb") as f:
@@ -48,7 +50,7 @@ class ImageDownloader(object):
                 f.write(img_res.content)
                 logger.info(f"{image_url} Download completed.")
 
-        return self._compile_post_description(title, author, circle_name, uri.url)
+        return post_descs
     
     """
     uriをチェックする
@@ -89,10 +91,9 @@ class ImageDownloader(object):
         save_dir_path = os.path.join(save_path, dirs)
         save_dir_path = self._unquote_save_dir(save_dir_path)
             
-        logger.info(f"save directory :{save_dir_path}")
+        logger.info(f"The save directory :{save_dir_path}")
         
         if not os.path.isdir(save_dir_path):
-            logger.info(f"Try to create a directory : {save_dir_path}")
             os.makedirs(save_dir_path)
             logger.info(f"Created a directory {save_dir_path}")
             
@@ -120,6 +121,8 @@ class ImageDownloader(object):
 
     def _compile_post_description(self, title:str, author:str, circle_name:str, url:str) -> list[str]:
         result = [f"{title}\n", f"作者：{author}\n", f"サークル名：{circle_name}\n", f"URL：{url}\n", "\n"]
+        if author is None:
+            result.pop(1)
         if circle_name is None:
             result.pop(2)
         return result
