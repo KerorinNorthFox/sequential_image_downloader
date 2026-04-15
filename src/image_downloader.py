@@ -37,7 +37,7 @@ class ImageDownloader(object):
         complete_save_dir = self._combine_save_dir(save_dir, uri, title, author)
         
         for i, image_url in enumerate(image_urls):
-            save_path = os.path.join(complete_save_dir, f"{i+1}.jpg")
+            save_path = os.path.join(complete_save_dir, self._replace_ban_words(f"{title}_{i+1}.jpg"))
             if os.path.exists(save_path):
                 logger.warn(f"The file is already exists. Skip it.")
                 continue
@@ -48,7 +48,7 @@ class ImageDownloader(object):
                 f.write(img_res.content)
                 logger.info(f"{image_url} Download completed.")
 
-        return self._generate_post_text(title, author, circle_name, uri.url)
+        return self._compile_post_description(title, author, circle_name, uri.url)
     
     """
     uriをチェックする
@@ -84,9 +84,7 @@ class ImageDownloader(object):
         else:
             dirs = f"{dirs}/{uri.file}"
             
-        dir_ban_words = ["?", ":", "<", ">", "|"]
-        for dir_ban_word in dir_ban_words:
-            dirs = dirs.replace(dir_ban_word, "")
+        dirs = self._replace_ban_words(dirs)
             
         save_dir_path = os.path.join(save_path, dirs)
         save_dir_path = self._unquote_save_dir(save_dir_path)
@@ -99,6 +97,12 @@ class ImageDownloader(object):
             logger.info(f"Created a directory {save_dir_path}")
             
         return save_dir_path
+    
+    def _replace_ban_words(self, text):
+        dir_ban_words = ["?", ":", "<", ">", "|"]
+        for dir_ban_word in dir_ban_words:
+            text = text.replace(dir_ban_word, "")
+        return text
     
     def _unquote_save_dir(self, save_dir_path):
         dir_path = urllib.parse.unquote(save_dir_path)
@@ -114,6 +118,9 @@ class ImageDownloader(object):
         
         return uri
 
-    def _generate_post_text(self, title:str, author:str, circle_name:str, url:str) -> list[str]:
-        return [f"{title}", f"{author}", f"{circle_name}", f"{url}", ""]
+    def _compile_post_description(self, title:str, author:str, circle_name:str, url:str) -> list[str]:
+        result = [f"{title}\n", f"作者：{author}\n", f"サークル名：{circle_name}\n", f"URL：{url}\n", "\n"]
+        if circle_name is None:
+            result.pop(2)
+        return result
 
