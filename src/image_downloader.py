@@ -33,12 +33,13 @@ class ImageDownloader(object):
         
         post_descs = self._compile_post_description(title, author, circle_name, uri.url)
         for desc in post_descs:
-            print(desc)
+            print(desc.strip("\n"))
         
         complete_save_dir = self._combine_save_dir(save_dir, uri, title, author)
         
         for i, image_url in enumerate(image_urls):
-            file_name = self._replace_ban_words(f"{title}_{i+1}.jpg")
+            unique_title = title if title is not None else uri.file
+            file_name = self._replace_ban_words(f"{unique_title}_{i+1}.jpg", is_slash_contain=True)
             save_path = os.path.join(complete_save_dir, file_name)
             if os.path.exists(save_path):
                 logger.warn(f"The file '{file_name}' is already exists. Skip it.")
@@ -99,8 +100,10 @@ class ImageDownloader(object):
             
         return save_dir_path
     
-    def _replace_ban_words(self, text):
+    def _replace_ban_words(self, text, is_slash_contain=False):
         dir_ban_words = ["?", ":", "<", ">", "|"]
+        if is_slash_contain:
+            dir_ban_words.append("/")
         for dir_ban_word in dir_ban_words:
             text = text.replace(dir_ban_word, "")
         return text
@@ -121,8 +124,6 @@ class ImageDownloader(object):
 
     def _compile_post_description(self, title:str, author:str, circle_name:str, url:str) -> list[str]:
         result = [f"{title}\n", f"作者：{author}\n", f"サークル名：{circle_name}\n", f"URL：{url}\n", "\n"]
-        if author is None:
-            result.pop(1)
         if circle_name is None:
             result.pop(2)
         return result
