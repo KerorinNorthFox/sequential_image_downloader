@@ -101,7 +101,7 @@ class ImageDownloader(object):
         return save_dir_path
     
     def _replace_ban_words(self, text, is_slash_contain=False):
-        dir_ban_words = ["?", ":", "<", ">", "|"]
+        dir_ban_words = ["?", ":", "<", ">", "|", "*"]
         if is_slash_contain:
             dir_ban_words.append("/")
         for dir_ban_word in dir_ban_words:
