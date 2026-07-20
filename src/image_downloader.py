@@ -75,17 +75,19 @@ class ImageDownloader(object):
         dirs = ""
         if uri.directories != []: # urlの間のディレクトリをパスにする
             for directory in uri.directories:
-                dirs += "/" + directory
+                dirs += "/" + self._replace_ban_words(directory, is_slash_contain=True)
                 
         if author is not None:
             dirs = f"{uri.domain}{dirs}/{author}"
         else:
             dirs = f"{uri.domain}{dirs}"
         
+        filename_without_banned = self._replace_ban_words(uri.file, is_slash_contain = True)
         if title is not None:
-            dirs = f"{dirs}/{title}_{uri.file}"
+            title = self._replace_ban_words(title, is_slash_contain=True)
+            dirs = f"{dirs}/{title}_{filename_without_banned}"
         else:
-            dirs = f"{dirs}/{uri.file}"
+            dirs = f"{dirs}/{filename_without_banned}"
             
         dirs = self._replace_ban_words(dirs)
             
